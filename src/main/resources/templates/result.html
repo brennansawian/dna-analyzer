@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Analysis Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+        }
+        .navbar {
+            background-color: #112D4E;
+        }
+        .navbar-brand {
+            color: #f9f7f7 !important;
+        }
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            background-color: #f9f7f7;
+            color: #112D4E;
+        }
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #3f72af;
+        }
+        .sequence-box {
+            background-color: #dbe2ef;
+            border-radius: 10px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .btn-home {
+            background: linear-gradient(90deg, #3f72af, #112D4E);
+            color: white;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn-home:hover {
+            background: linear-gradient(90deg, #112D4E, #3f72af);
+            box-shadow: 0 0 10px #3f72af;
+        }
+        .codon-list-item {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .codon-badge {
+            background-color: #3f72af;
+            color: #f9f7f7;
+            border-radius: 6px;
+            padding: 2px 8px;
+            margin-right: 6px;
+        }
+        .scroll-box {
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .summary-pill {
+            font-size: 0.85rem;
+            padding: 6px 10px;
+            border-radius: 999px;
+        }
+        /* AI card styling */
+        .ai-card {
+            background-color: #edf2fb;
+            border-radius: 12px;
+            padding: 16px 18px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="/">DNA Sequence Analyzer</a>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card p-4">
+                <!-- HEADER -->
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
+                    <div>
+                        <h3 class="mb-0">Analysis Results</h3>
+                        <small class="text-muted">Overview of your DNA → mRNA → Protein translation</small>
+                    </div>
+                    <div class="mt-2 mt-md-0 d-flex gap-2">
+                        <span class="summary-pill bg-light text-muted">
+                            Coding bases: <span th:text="${codingBases}">0</span>
+                        </span>
+                        <span class="summary-pill bg-light text-muted">
+                            Non-coding bases: <span th:text="${nonCodingBases}">0</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- MAIN ROW -->
+                <div class="row align-items-start g-4">
+                    <!-- LEFT COLUMN -->
+                    <div class="col-md-8">
+                        <!-- Sequences accordion -->
+                        <div class="mb-3">
+                            <p class="section-title mb-2">Sequences</p>
+                            <div class="accordion" id="sequenceAccordion">
+
+                                <!-- DNA -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="dnaHeading">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#dnaCollapse" aria-expanded="true"
+                                                aria-controls="dnaCollapse">
+                                            Original DNA Sequence
+                                        </button>
+                                    </h2>
+                                    <div id="dnaCollapse" class="accordion-collapse collapse show"
+                                         aria-labelledby="dnaHeading">
+                                        <div class="accordion-body">
+                                            <div class="sequence-box" th:text="${dnaSequence}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- mRNA -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="mrnaHeading">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#mrnaCollapse" aria-expanded="false"
+                                                aria-controls="mrnaCollapse">
+                                            Transcribed mRNA Sequence
+                                        </button>
+                                    </h2>
+                                    <div id="mrnaCollapse" class="accordion-collapse collapse"
+                                         aria-labelledby="mrnaHeading">
+                                        <div class="accordion-body">
+                                            <div class="sequence-box" th:text="${mrnaSequence}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Protein -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="proteinHeading">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#proteinCollapse" aria-expanded="false"
+                                                aria-controls="proteinCollapse">
+                                            Translated Amino Acid Sequence
+                                        </button>
+                                    </h2>
+                                    <div id="proteinCollapse" class="accordion-collapse collapse"
+                                         aria-labelledby="proteinHeading">
+                                        <div class="accordion-body">
+                                            <div class="sequence-box" th:text="${aminoAcidSequence}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Coding / non-coding analysis -->
+                        <div class="mb-3">
+                            <p class="section-title">Coding &amp; Non-Coding Nucleotide Analysis</p>
+
+                            <div class="sequence-box mb-2">
+                                <p><strong>Coding Nucleotides:</strong></p>
+                                <div th:text="${codingSequence}"></div>
+                            </div>
+
+                            <div class="sequence-box mb-2">
+                                <p><strong>Non-Coding Nucleotides:</strong></p>
+                                <div th:text="${nonCodingSequence}"></div>
+                            </div>
+
+                            <div class="sequence-box">
+                                <p><strong>Coding Count:</strong> <span th:text="${codingCount}"></span></p>
+                                <p><strong>Non-Coding Count:</strong> <span th:text="${nonCodingCount}"></span></p>
+                                <p><strong>Coding %:</strong> <span th:text="${codingPercent}"></span>%</p>
+                                <p><strong>Non-Coding %:</strong> <span th:text="${nonCodingPercent}"></span>%</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN -->
+                    <div class="col-md-4">
+                        <!-- Image + attribution -->
+                        <div class="mb-3 text-center">
+                            <a href="https://en.wikipedia.org/wiki/Genetic_code#/media/File:Aminoacid.svg"
+                               target="_blank" rel="noopener noreferrer">
+                                <img src="/aminoacid.svg"
+                                     alt="Codon Chart"
+                                     class="img-fluid rounded shadow-sm"
+                                     style="max-height: 260px; object-fit: contain;"
+                                     onerror="this.style.display='none';">
+                            </a>
+                            <p class="mt-2 text-muted small mb-0">
+                                Codon Reference Chart<br>
+                                <a href="https://en.wikipedia.org/wiki/Genetic_code#/media/File:Aminoacid.svg"
+                                   target="_blank" rel="noopener noreferrer">
+                                    Source: Wikipedia
+                                </a>
+                            </p>
+                        </div>
+
+                        <!-- Base-level summary -->
+                        <div class="sequence-box">
+                            <p class="section-title mb-2" style="font-size: 0.95rem;">Base-Level Summary</p>
+
+                            <dl class="row mb-0 small">
+                                <dt class="col-7 fw-semibold">Coding bases</dt>
+                                <dd class="col-5 text-end mb-1">
+                                    <span th:text="${codingBases}">0</span>
+                                    (&nbsp;<span th:text="${codingPercentage}">0</span>%&nbsp;)
+                                </dd>
+
+                                <dt class="col-7 fw-semibold">Non-coding bases</dt>
+                                <dd class="col-5 text-end mb-1">
+                                    <span th:text="${nonCodingBases}">0</span>
+                                    (&nbsp;<span th:text="${nonCodingPercentage}">0</span>%&nbsp;)
+                                </dd>
+                            </dl>
+
+                            <p class="mt-2 mb-0 text-muted small">
+                                Coding bases are those between the start codon (AUG) and the first stop codon.
+                            </p>
+                        </div>
+                    </div>
+                </div> <!-- /row (left+right) -->
+
+                <!-- CODON EXPLANATIONS -->
+                <div class="mt-4"
+                     th:if="${codonExplanations != null and !codonExplanations.isEmpty()}">
+                    <p class="section-title">Coding Region Codons</p>
+                    <div class="sequence-box">
+                        <p class="mb-2">
+                            Below are the codons that appear in the <strong>coding region</strong> of your mRNA.
+                            Codons used <strong>most frequently</strong> are highlighted.
+                        </p>
+
+                        <ul class="list-group scroll-box">
+                            <li class="list-group-item codon-list-item d-flex justify-content-between align-items-center"
+                                th:each="entry : ${codonExplanations}"
+                                th:classappend="${codonCounts[entry.key]} == maxCodonCount and maxCodonCount > 0 ?
+                                ' border border-2 border-warning bg-warning-subtle' : ''">
+                                <div>
+                                    <span class="codon-badge" th:text="${entry.key}">AUG</span>
+                                    <span th:text="${entry.value}">Explanation text here...</span>
+                                </div>
+                                <span class="badge bg-secondary rounded-pill"
+                                      th:text="'x ' + ${codonCounts[entry.key]}">
+                                    x 1
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- AI INTERPRETATION -->
+                <div class="mt-4"
+                     th:if="${aiExplanation != null and !#strings.isEmpty(aiExplanation)}">
+                    <p class="section-title text-center">AI Interpretation</p>
+                    <div class="ai-card">
+                        <p class="mb-0"
+                           th:text="${#strings.replace(#strings.replace(aiExplanation, '**', ''), '*', '')}">
+                            AI explanation will appear here.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- BUTTON -->
+                <div class="text-center mt-4">
+                    <a href="/" class="btn btn-home px-4">Analyze Another Sequence</a>
+                </div>
+
+            </div> <!-- /card -->
+        </div> <!-- /col-lg-10 -->
+    </div> <!-- /row -->
+</div> <!-- /container -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
